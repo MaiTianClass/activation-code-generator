@@ -17,20 +17,23 @@
         }
         .container {
             background-color: white;
-            padding: 20px;
+            padding: 30px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             text-align: center;
+            max-width: 500px;
+            margin: 20px;
         }
         input, button {
-            margin: 10px 0;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 12px;
             font-size: 16px;
             width: 100%;
         }
         input {
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box;
         }
         button {
             background-color: #007BFF;
@@ -38,15 +41,23 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            padding: 12px;
         }
         button:hover {
             background-color: #0056b3;
         }
-        #generatedCode {
+        #activationCodeOutput {
             font-size: 18px;
             margin-top: 20px;
             color: #007BFF;
             word-wrap: break-word;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #activationKey {
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -55,7 +66,7 @@
         <h1>激活码生成器</h1>
         <input type="text" id="activationKey" placeholder="请输入密钥">
         <button onclick="generateActivationCode()">生成激活码</button>
-        <div id="generatedCode"></div>
+        <input type="text" id="activationCodeOutput" readonly placeholder="生成的激活码将在此处显示">
         <button onclick="copyToClipboard()">复制激活码</button>
     </div>
     <script>
@@ -65,13 +76,13 @@
             // 检查输入是否为空
             if (!userKey) {
                 alert("请先输入密钥再生成激活码！");
-                document.getElementById("generatedCode").innerText = ""; // 不显示任何文字
+                document.getElementById("activationCodeOutput").value = ""; // 不显示任何文字
                 return;
             }
 
             // 等待 Promise 解析并显示激活码
             const activationCode = await generateActivationCodeFromKey(userKey);
-            document.getElementById("generatedCode").innerText = activationCode;
+            document.getElementById("activationCodeOutput").value = activationCode;
         }
 
         function generateActivationCodeFromKey(key) {
@@ -97,7 +108,7 @@
         }
 
         function copyToClipboard() {
-            const activationCode = document.getElementById("generatedCode").innerText;
+            const activationCode = document.getElementById("activationCodeOutput").value;
             const userKey = document.getElementById("activationKey").value;
 
             if (!userKey || !activationCode) {
