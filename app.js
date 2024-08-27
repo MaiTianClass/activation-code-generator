@@ -1,4 +1,4 @@
-function generateActivationCode() {
+async function generateActivationCode() {
     const userKey = document.getElementById("activationKey").value;
 
     // 检查输入是否为空
@@ -8,13 +8,13 @@ function generateActivationCode() {
         return;
     }
 
-    // 生成激活码
-    const activationCode = generateActivationCodeFromKey(userKey);
+    // 等待 Promise 解析并显示激活码
+    const activationCode = await generateActivationCodeFromKey(userKey);
     document.getElementById("generatedCode").innerText = activationCode;
 }
 
 function generateActivationCodeFromKey(key) {
-    // 使用 Web Crypto API 进行 SHA256 哈希
+    // 使用 Web Crypto API 进行 SHA-256 哈希计算
     return crypto.subtle.digest("SHA-256", new TextEncoder().encode(key)).then(hashBuffer => {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
