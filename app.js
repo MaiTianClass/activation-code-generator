@@ -8,20 +8,24 @@ async function generateActivationCode() {
         return;
     }
 
-    // 等待 Promise 解析并显示激活码
-    const activationCode = await generateActivationCodeFromKey(userKey);
-    document.getElementById("generatedCode").innerText = activationCode;
+    try {
+        // 等待异步操作并获取激活码
+        const activationCode = await generateActivationCodeFromKey(userKey);
+        document.getElementById("generatedCode").innerText = activationCode;
+    } catch (error) {
+        console.error('生成激活码时出错:', error);
+        alert('生成激活码失败，请稍后再试。');
+    }
 }
 
-function generateActivationCodeFromKey(key) {
+async function generateActivationCodeFromKey(key) {
     // 使用 Web Crypto API 进行 SHA-256 哈希计算
-    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(key)).then(hashBuffer => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        const rawCode = hashHex.slice(0, 24).toUpperCase();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const rawCode = hashHex.slice(0, 24).toUpperCase();
 
-        return formatActivationCode(rawCode);
-    });
+    return formatActivationCode(rawCode);
 }
 
 function formatActivationCode(code) {
