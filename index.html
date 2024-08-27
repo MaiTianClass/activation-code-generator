@@ -42,67 +42,40 @@
         button:hover {
             background-color: #0056b3;
         }
-        #activationCodeOutput {
+        #generatedCode {
             font-size: 18px;
             margin-top: 20px;
             color: #007BFF;
             word-wrap: break-word;
         }
-        #loginContainer, #generatorContainer {
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <!-- 登录界面 -->
-    <div class="container" id="loginContainer">
-        <h1>用户登录</h1>
-        <input type="text" id="username" placeholder="用户名">
-        <input type="password" id="password" placeholder="密码">
-        <button onclick="login()">登录</button>
-    </div>
-
-    <!-- 激活码生成器界面 -->
-    <div class="container" id="generatorContainer">
+    <div class="container">
         <h1>激活码生成器</h1>
         <input type="text" id="activationKey" placeholder="请输入密钥">
         <button onclick="generateActivationCode()">生成激活码</button>
-        <input type="text" id="activationCodeOutput" readonly placeholder="生成的激活码将在此处显示">
+        <div id="generatedCode"></div>
         <button onclick="copyToClipboard()">复制激活码</button>
     </div>
-
     <script>
-        // 模拟的用户信息，真实应用中应使用服务器端验证
-        const validUsername = "admin";
-        const validPassword = "password123";
-
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            if (username === validUsername && password === validPassword) {
-                // 登录成功，显示激活码生成器界面
-                document.getElementById("loginContainer").style.display = "none";
-                document.getElementById("generatorContainer").style.display = "block";
-            } else {
-                alert("用户名或密码错误！");
-            }
-        }
-
         async function generateActivationCode() {
             const userKey = document.getElementById("activationKey").value;
 
+            // 检查输入是否为空
             if (!userKey) {
                 alert("请先输入密钥再生成激活码！");
-                document.getElementById("activationCodeOutput").value = ""; // 不显示任何文字
+                document.getElementById("generatedCode").innerText = ""; // 不显示任何文字
                 return;
             }
 
+            // 等待 Promise 解析并显示激活码
             const activationCode = await generateActivationCodeFromKey(userKey);
-            document.getElementById("activationCodeOutput").value = activationCode;
+            document.getElementById("generatedCode").innerText = activationCode;
         }
 
         function generateActivationCodeFromKey(key) {
+            // 使用 Web Crypto API 进行 SHA-256 哈希计算
             return crypto.subtle.digest("SHA-256", new TextEncoder().encode(key)).then(hashBuffer => {
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
                 const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -113,6 +86,7 @@
         }
 
         function formatActivationCode(code) {
+            // 将24位激活码分为5段
             const part1 = code.slice(0, 4);
             const part2 = code.slice(4, 9);
             const part3 = code.slice(9, 14);
@@ -123,7 +97,7 @@
         }
 
         function copyToClipboard() {
-            const activationCode = document.getElementById("activationCodeOutput").value;
+            const activationCode = document.getElementById("generatedCode").innerText;
             const userKey = document.getElementById("activationKey").value;
 
             if (!userKey || !activationCode) {
@@ -131,15 +105,13 @@
                 return;
             }
 
+            // 复制激活码到剪贴板
             navigator.clipboard.writeText(activationCode).then(() => {
                 alert("激活码已成功复制到剪贴板!");
             }, err => {
                 alert("复制失败，请手动复制!");
             });
         }
-
-        // 初始时显示登录界面
-        document.getElementById("loginContainer").style.display = "block";
     </script>
 </body>
 </html>
